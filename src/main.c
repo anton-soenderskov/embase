@@ -12,13 +12,16 @@ void print_usage(char *argv[]) {
     printf("\t -n - create new database file\n");
     printf("\t -f - (required) path to database file\n");
     printf("\t -l - list the employees\n");
-    printf("\t -a - add via CSV lsit of (name,address,salary)\n");
+    printf("\t -a - add via CSV list of (name,address,salary)\n");
+    printf("\t -u - update employee hours via CSV list of (name,salary)\n");
     return;
 }
 
 int main(int argc, char *argv[]) { 
     char *filepath = NULL;
     char *addstring = NULL;
+    char *updateHours = NULL;
+    char *removestring = NULL;
     bool newfile = false;
     bool list = false;
     int c;
@@ -27,7 +30,7 @@ int main(int argc, char *argv[]) {
     struct dbheader_t *dbhdr = NULL;
     struct employee_t *employees = NULL;
 
-	while ((c = getopt(argc, argv, "nf:a:l")) != -1) {
+	while ((c = getopt(argc, argv, "nf:a:lu:r:")) != -1) {
         switch (c) {
             case 'n':
                 newfile = true;
@@ -40,6 +43,12 @@ int main(int argc, char *argv[]) {
                 break;
             case 'l':
                 list = true;
+                break;
+            case 'u':
+                updateHours = optarg;
+                break;
+            case 'r':
+                removestring = optarg;
                 break;
             case '?':
                 printf("Unknown option -%c\n", c);
@@ -87,6 +96,14 @@ int main(int argc, char *argv[]) {
         add_employee(dbhdr, &employees, addstring);
     }
     
+    if (updateHours) {
+        update_employee_hours(dbhdr, employees, updateHours);
+    }
+
+    if (removestring) {
+        remove_employee(dbhdr, &employees, removestring);
+    }
+
     if (list) {
         list_employees(dbhdr, employees);
     }
